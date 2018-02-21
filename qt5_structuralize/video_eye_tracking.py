@@ -19,12 +19,12 @@ class eyeTrackingWidget(QtWidgets.QWidget):
         self.audience_eye_tracking_dic = {}
         self.eye_track_dic = {}
         self.elements = {}
-        self.eye_track_frame_rate = 10
+        self.eye_track_frame_rate = 1000
         self.trial_lapse = 2000
         self.eye_tracking_width = 1024 ##eye tracking hardware resolution
         self.eye_tracking_height = 768 ##eye tracking hardware resolution
-        self.view_width= 1152 ##QGraphicsView resolution
-        self.view_height= 648 ##QGraphcsView
+        self.view_width= 910 ##QGraphicsView resolution
+        self.view_height= 500 ##QGraphcsView
         #####################       eye tracking        #####################
 
         self.layout = QtWidgets.QVBoxLayout(self)
@@ -73,21 +73,21 @@ class eyeTrackingWidget(QtWidgets.QWidget):
         self.hbuttonbox.addWidget(self.playbutton)
         self.playbutton.clicked.connect(self.play_pause)
 
-        self.openbutton = QtWidgets.QPushButton("Open")
+        self.openbutton = QtWidgets.QPushButton("Open video")
         self.hbuttonbox.addWidget(self.openbutton)
         self.openbutton.clicked.connect(self.open_file)
 
-        self.openbutton2 = QtWidgets.QPushButton("Open EYE")
-        self.hbuttonbox.addWidget(self.openbutton2)
-        self.openbutton2.clicked.connect(self.open_eye)
+        # self.openbutton2 = QtWidgets.QPushButton("Open EYE")
+        # self.hbuttonbox.addWidget(self.openbutton2)
+        # self.openbutton2.clicked.connect(self.open_eye)
 
-        self.comboLabel = QtWidgets.QLabel("Select objects:")
-        self.combobox = QtWidgets.QComboBox(self)
-        self.comboboxDelegate = utility.SubclassOfQStyledItemDelegate()
-        self.combobox.setItemDelegate(self.comboboxDelegate)
-        self.combobox.setSizeAdjustPolicy(0)
-        self.hbuttonbox.addWidget(self.comboLabel)
-        self.hbuttonbox.addWidget(self.combobox)
+        # self.comboLabel = QtWidgets.QLabel("Select objects:")
+        # self.combobox = QtWidgets.QComboBox(self)
+        # self.comboboxDelegate = utility.SubclassOfQStyledItemDelegate()
+        # self.combobox.setItemDelegate(self.comboboxDelegate)
+        # self.combobox.setSizeAdjustPolicy(0)
+        # self.hbuttonbox.addWidget(self.comboLabel)
+        # self.hbuttonbox.addWidget(self.combobox)
 
 
         self.hbuttonbox.addStretch(1)
@@ -96,11 +96,16 @@ class eyeTrackingWidget(QtWidgets.QWidget):
 
         self.player.setNotifyInterval(1000/self.eye_track_frame_rate)
         self.player.positionChanged.connect(self.updateUI)
-        self.player.positionChanged.connect(self.updateEyeTracking)
+        self.player.positionChanged.connect(self.printTime)
         self.player.durationChanged.connect(self.setRange)
         self.player.stateChanged.connect(self.setButtonCaption)
-
         self.setLayout(self.layout)
+
+    
+
+    def printTime(self):
+        return
+        #print(self.player.position())
 
     def setButtonCaption(self,state):
         if self.player.state() == QM.QMediaPlayer.PlayingState:
