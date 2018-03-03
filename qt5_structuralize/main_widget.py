@@ -27,7 +27,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def __init__(self):
         self.time = 0
-        self.eeg = None
+        #self.eeg = None
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
@@ -61,7 +61,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def syncEggRange(self):
-        self.gestureWidget.positionSlider.setRange(0, self.video_widget.positionSlider.maximum())
+    	self.gestureWidget.positionSlider.setRange(0, self.video_widget.positionSlider.maximum())
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
@@ -69,7 +69,7 @@ class Ui_MainWindow(object):
     def SyncScroll(self,position):
         self.gestureWidget.positionSlider.setValue(position)
         if self.gestureWidget.pause_signal == True:
-        	self.video_widget.play_pause()
+        	self.video_widget.player.pause()
 
     def updateScroll(self,position):
         self.video_widget.player.pause()

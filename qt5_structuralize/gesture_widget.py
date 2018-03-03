@@ -1,7 +1,7 @@
 import sys
 import os
 from pathlib import Path
-from PyQt5 import QtCore
+from PyQt5 import QtCore, Qt
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 import utility
@@ -46,6 +46,13 @@ class gestureWidget(QtWidgets.QWidget):
         self.positionSlider = QtWidgets.QSlider(QtCore.Qt.Horizontal, self)
         self.positionSlider.setStyleSheet("QSlider::groove:horizontal {background-color:grey;}"
                                 "QSlider::handle:horizontal {background-color:black; height:8px; width: 8px;}")
+        # self.positionSlider.setMinimum(1)
+        # self.positionSlider.setMaximum(9)
+        # self.positionSlider.setTickInterval(1)
+        # self.positionSlider.setSingleStep(1) # arrow-key step-size
+        # self.positionSlider.setPageStep(1) # mouse-wheel/page-key step-size
+        # self.positionSlider.setTickPosition(QtWidgets.QSlider.TicksBelow)
+
         #self.positionSlider.valueChanged.connect(self.update_eeg_graph)
 
         self.hbuttonbox = QtWidgets.QHBoxLayout()
@@ -64,7 +71,7 @@ class gestureWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.scrollarea)
         self.layout.addWidget(self.positionSlider)
         self.layout.addLayout(self.hbuttonbox)
-
+        
         self.positionSlider.valueChanged.connect(self.setGestureType)
         self.setLayout(self.layout)
 
@@ -76,23 +83,46 @@ class gestureWidget(QtWidgets.QWidget):
             return
         self.time = self.positionSlider.value()
         self.pause_signal = False
-        if int(self.time/1000) == self.gesture_data[self.gesture_pos][1]:
+        if int(self.time/1000) == self.gesture_data[self.gesture_pos,2]:
             self.pause_signal = True
-            label = QtWidgets.QLabel(self.gesture_dict[self.gesture_data[self.gesture_pos][0]])
-            self.graph_layout.addWidget(label)
+            label = QtWidgets.QLabel("<h1><b><font size=5>"+str(self.gesture_data[self.gesture_pos,3])+"</font></b>")
+            self.graph_layout.addWidget(label,self.gesture_pos+1,0,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+            label = QtWidgets.QLabel("<h1><b><font size=5>"+self.gesture_dict[self.gesture_data[self.gesture_pos][1]]+"</font></b>")
+            self.graph_layout.addWidget(label,self.gesture_pos+1,1,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+            label = QtWidgets.QLabel("<h1><b><font size=5>"+str(self.gesture_data[self.gesture_pos,4:])+"</font></b>")
+            self.graph_layout.addWidget(label,self.gesture_pos+1,2,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
             self.gesture_pos = self.gesture_pos+1
+        else:
+        	if int(self.time/1000) > self.gesture_data[self.gesture_pos,2]:
+        		#self.positionSlider.setValue(self.gesture_data[self.gesture_pos,2]*1000)
+        		self.pause_signal = True
+        		label = QtWidgets.QLabel("<h1><b><font size=5>"+str(self.gesture_data[self.gesture_pos,3])+"</font></b>")
+        		self.graph_layout.addWidget(label,self.gesture_pos+1,0,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+        		label = QtWidgets.QLabel("<h1><b><font size=5>"+self.gesture_dict[self.gesture_data[self.gesture_pos][1]]+"</font></b>")
+        		self.graph_layout.addWidget(label,self.gesture_pos+1,1,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+        		label = QtWidgets.QLabel("<h1><b><font size=5>"+str(self.gesture_data[self.gesture_pos,4:])+"</font></b>")
+        		self.graph_layout.addWidget(label,self.gesture_pos+1,2,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+        		self.gesture_pos = self.gesture_pos+1
+
 
     def open_file(self, filename=None):
         home = str(Path.home())
         filename, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open Gesture", home)
         if not filename:
             return
-        self.gesture_data = open(filename).read().splitlines()
-        for i in range(len(self.gesture_data)):
-            self.gesture_data[i]=self.gesture_data[i].split(' ')
-            self.gesture_data[i][0] = int(self.gesture_data[i][0])
-            self.gesture_data[i][1] = int(int(self.gesture_data[i][1])/30)
-        self.gesture_len = len(self.gesture_data)
+        self.gesture_data = pandas.read_csv(filename).as_matrix()
+        self.gesture_data[:,2] = (self.gesture_data[:,2]/30).astype('int64')
+        # for i in range(len(self.gesture_data)):
+        #     self.gesture_data[i]=self.gesture_data[i].split(' ')
+        #     self.gesture_data[i][0] = int(self.gesture_data[i][0])
+        #     self.gesture_data[i][1] = int(int(self.gesture_data[i][1])/30)
+        self.gesture_len = self.gesture_data.shape[0]
+        label = QtWidgets.QLabel("<h1><b><u><font size=6>"+'Question'+"</font></u></b>")
+        self.graph_layout.addWidget(label,0,0,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+        label = QtWidgets.QLabel("<h1><b><u><font size=6>"+'Gesture'+"</font></u></b>")
+        self.graph_layout.addWidget(label,0,1,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+        label = QtWidgets.QLabel("<h1><b><u><font size=6>"+'Scores'+"</font></u></b>")
+        self.graph_layout.addWidget(label,0,2,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
 
 
 
