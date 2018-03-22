@@ -17,10 +17,11 @@ class gestureWidget(QtWidgets.QWidget):
         QtWidgets.QWidget.__init__(self, *args, **kwargs)
         self.gesture_data = None
         self.gesture_pos = 0
+        self.gesture_prev = -1
         self.gesture_len = 0
         self.gesture_dict = {0:'metaphoric',1:'beats',2:'deictics',3:'iconic'}
         self.graph_width = 910
-        self.graph_height = 200
+        self.graph_height = 100
         self.time = 0
         self.layout = QtWidgets.QVBoxLayout(self)
         self.createUI()
@@ -57,15 +58,23 @@ class gestureWidget(QtWidgets.QWidget):
 
         self.hbuttonbox = QtWidgets.QHBoxLayout()
         self.openbutton = QtWidgets.QPushButton("Open gesture")
+        self.hbuttonbox.addWidget(self.openbutton)
+        self.openbutton.clicked.connect(self.open_file)
+        
+        self.prevbutton = QtWidgets.QPushButton("Prev")
+        self.hbuttonbox.addWidget(self.prevbutton)
+        self.prevbutton.clicked.connect(self.get_prev)
+
+        self.nextbutton = QtWidgets.QPushButton("Next")
+        self.hbuttonbox.addWidget(self.nextbutton)
+        self.nextbutton.clicked.connect(self.get_next)
         # self.comboLabel = QtWidgets.QLabel("Select Channels:")
         # self.combobox = QtWidgets.QComboBox(self)
         # self.comboboxDelegate = utility.SubclassOfQStyledItemDelegate()
         # self.combobox.setItemDelegate(self.comboboxDelegate)
         # self.combobox.setSizeAdjustPolicy(0)
-        self.hbuttonbox.addWidget(self.openbutton)
         # self.hbuttonbox.addWidget(self.comboLabel)
         # self.hbuttonbox.addWidget(self.combobox)
-        self.openbutton.clicked.connect(self.open_file)
 
         self.hbuttonbox.addStretch(1)
         self.layout.addWidget(self.scrollarea)
@@ -91,18 +100,19 @@ class gestureWidget(QtWidgets.QWidget):
             self.graph_layout.addWidget(label,self.gesture_pos+1,1,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
             label = QtWidgets.QLabel("<h1><b><font size=5>"+str(self.gesture_data[self.gesture_pos,4:])+"</font></b>")
             self.graph_layout.addWidget(label,self.gesture_pos+1,2,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+            self.gesture_prev = self.gesture_pos
             self.gesture_pos = self.gesture_pos+1
         else:
-        	if int(self.time/1000) > self.gesture_data[self.gesture_pos,2]:
-        		#self.positionSlider.setValue(self.gesture_data[self.gesture_pos,2]*1000)
-        		self.pause_signal = True
-        		label = QtWidgets.QLabel("<h1><b><font size=5>"+str(self.gesture_data[self.gesture_pos,3])+"</font></b>")
-        		self.graph_layout.addWidget(label,self.gesture_pos+1,0,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
-        		label = QtWidgets.QLabel("<h1><b><font size=5>"+self.gesture_dict[self.gesture_data[self.gesture_pos][1]]+"</font></b>")
-        		self.graph_layout.addWidget(label,self.gesture_pos+1,1,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
-        		label = QtWidgets.QLabel("<h1><b><font size=5>"+str(self.gesture_data[self.gesture_pos,4:])+"</font></b>")
-        		self.graph_layout.addWidget(label,self.gesture_pos+1,2,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
-        		self.gesture_pos = self.gesture_pos+1
+            if int(self.time/1000) > self.gesture_data[self.gesture_pos,2]:
+                self.pause_signal = True
+                label = QtWidgets.QLabel("<h1><b><font size=5>"+str(self.gesture_data[self.gesture_pos,3])+"</font></b>")
+                self.graph_layout.addWidget(label,self.gesture_pos+1,0,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+                label = QtWidgets.QLabel("<h1><b><font size=5>"+self.gesture_dict[self.gesture_data[self.gesture_pos][1]]+"</font></b>")
+                self.graph_layout.addWidget(label,self.gesture_pos+1,1,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+                label = QtWidgets.QLabel("<h1><b><font size=5>"+str(self.gesture_data[self.gesture_pos,4:])+"</font></b>")
+                self.graph_layout.addWidget(label,self.gesture_pos+1,2,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+                self.gesture_prev = self.gesture_pos
+                self.gesture_pos = self.gesture_pos+1
 
 
     def open_file(self, filename=None):
@@ -124,6 +134,19 @@ class gestureWidget(QtWidgets.QWidget):
         label = QtWidgets.QLabel("<h1><b><u><font size=6>"+'Scores'+"</font></u></b>")
         self.graph_layout.addWidget(label,0,2,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
 
+    def get_next(self):
+        try:
+            self.gesture_prev += 1
+            self.positionSlider.setValue(self.gesture_data[self.gesture_prev,2]*1000 - 100)
+        except:
+            self.gesture_prev -=1
+
+    def get_prev(self):
+        if self.gesture_prev == -1:
+            self.positionSlider.setValue(0)
+        else:
+            self.positionSlider.setValue(self.gesture_data[self.gesture_prev,2]*1000 - 100) 
+            self.gesture_prev -= 1       
 
 
 if __name__ == '__main__':

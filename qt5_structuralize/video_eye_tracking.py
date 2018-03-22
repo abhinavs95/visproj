@@ -15,16 +15,9 @@ import pandas
 class eyeTrackingWidget(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self, *args, **kwargs)
-        #####################       eye tracking        #####################
-        self.audience_eye_tracking_dic = {}
-        self.eye_track_dic = {}
-        self.elements = {}
-        self.eye_track_frame_rate = 1000
-        self.trial_lapse = 2000
-        self.eye_tracking_width = 1024 ##eye tracking hardware resolution
-        self.eye_tracking_height = 768 ##eye tracking hardware resolution
         self.view_width= 910 ##QGraphicsView resolution
-        self.view_height= 500 ##QGraphcsView
+        self.view_height= 400 ##QGraphcsView
+        self.play_state = False
         #####################       eye tracking        #####################
 
         self.layout = QtWidgets.QVBoxLayout(self)
@@ -76,7 +69,6 @@ class eyeTrackingWidget(QtWidgets.QWidget):
         self.openbutton = QtWidgets.QPushButton("Open video")
         self.hbuttonbox.addWidget(self.openbutton)
         self.openbutton.clicked.connect(self.open_file)
-
         # self.openbutton2 = QtWidgets.QPushButton("Open EYE")
         # self.hbuttonbox.addWidget(self.openbutton2)
         # self.openbutton2.clicked.connect(self.open_eye)
@@ -94,7 +86,7 @@ class eyeTrackingWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.positionSlider)
         self.layout.addLayout(self.hbuttonbox)
 
-        self.player.setNotifyInterval(0.1)
+        self.player.setNotifyInterval(100)
         self.player.positionChanged.connect(self.updateUI)
         #self.player.positionChanged.connect(self.printTime)
         self.player.durationChanged.connect(self.setRange)
@@ -141,9 +133,12 @@ class eyeTrackingWidget(QtWidgets.QWidget):
 
     def play_pause(self):
         #self.videoItem.setSize(QtCore.QSizeF(self.view_width, self.view_height))
+
         if self.player.state() == QM.QMediaPlayer.PlayingState:
+            self.play_state = False
             self.player.pause()
         else:
+            self.play_state = True
             self.player.play()
 
     def get_state(self):
