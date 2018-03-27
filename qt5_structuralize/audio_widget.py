@@ -16,7 +16,7 @@ class audioWidget(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self, *args, **kwargs)
         self.view_width= 910 ##QGraphicsView resolution
-        self.view_height= 100 ##QGraphcsView
+        self.view_height= 200 ##QGraphcsView
         self.play_state = False
         #####################       eye tracking        #####################
 

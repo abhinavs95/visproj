@@ -36,18 +36,18 @@ class Ui_MainWindow(object):
         self.centralWidget = QtWidgets.QWidget(MainWindow)
         self.centralWidget.setObjectName(_fromUtf8("centralWidget"))
         self.video_widget = video_eye_tracking.eyeTrackingWidget(self.centralWidget)
-        self.video_widget.setGeometry(QtCore.QRect(5, 5, 954, 500))
+        self.video_widget.setGeometry(QtCore.QRect(5, 5, 954, 400))
         self.video_widget.setObjectName(_fromUtf8("eyeTrackingWidget"))
 
         self.gestureWidget = gesture_widget.gestureWidget(self.centralWidget)
-        self.gestureWidget.setGeometry(QtCore.QRect(5, 500, 954, 200))
+        self.gestureWidget.setGeometry(QtCore.QRect(5, 400, 954, 200))
         self.gestureWidget.setObjectName(_fromUtf8("graphicsView"))
 
         # self.slider = QtGui.QSlider(QtCore.Qt.Horizontal, self.centralWidget)
         # self.slider.setGeometry(QtCore.QRect(20,500,500,60))
 
         self.audioWidget = audio_widget.audioWidget(self.centralWidget)
-        self.audioWidget.setGeometry(QtCore.QRect(5, 700, 954, 200))
+        self.audioWidget.setGeometry(QtCore.QRect(5, 600, 954, 300))
         self.audioWidget.setObjectName(_fromUtf8("graphicsView"))
 
         self.video_widget.positionSlider.rangeChanged.connect(self.syncEggRange)
@@ -56,8 +56,8 @@ class Ui_MainWindow(object):
         self.gestureWidget.positionSlider.sliderMoved.connect(self.updateScroll)
         self.audioWidget.positionSlider.valueChanged.connect(self.SyncScroll3)
         self.audioWidget.positionSlider.sliderMoved.connect(self.updateScroll)
-        if self.gestureWidget.pause_signal == True:
-        	video_eye_tracking.eyeTrackingWidget(self.video_widget)
+        # if self.gestureWidget.pause_signal == True:
+        # 	video_eye_tracking.eyeTrackingWidget(self.video_widget)
         MainWindow.setCentralWidget(self.centralWidget)
 
         self.retranslateUi(MainWindow)
@@ -71,7 +71,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
 
     def SyncScroll(self,position):
-    	self.audioWidget.positionSlider.setValue(position)
+    	#self.audioWidget.positionSlider.setValue(position)
     	self.gestureWidget.positionSlider.setValue(position)
     	if self.gestureWidget.pause_signal == True:
     		self.video_widget.play_pause()
@@ -88,6 +88,8 @@ class Ui_MainWindow(object):
         self.audioWidget.play_pause()
         self.video_widget.positionSlider.setValue(position)
         self.video_widget.player.setPosition(position)
+        self.audioWidget.positionSlider.setValue(position)
+        self.audioWidget.player.setPosition(position)
 
     def SyncScroll3(self,position):
     	if self.video_widget.play_state != self.audioWidget.play_state:

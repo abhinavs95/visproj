@@ -91,6 +91,7 @@ class gestureWidget(QtWidgets.QWidget):
             self.pause_signal = False
             return
         self.time = self.positionSlider.value()
+        print(int(self.time/1000))
         self.pause_signal = False
         if int(self.time/1000) == self.gesture_data[self.gesture_pos,2]:
             self.pause_signal = True
