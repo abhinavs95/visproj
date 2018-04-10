@@ -23,6 +23,7 @@ class eyeTrackingWidget(QtWidgets.QWidget):
         self.one = ''
         self.two = ''
         self.time = -1
+        self.ges_dict = {}
         #####################       eye tracking        #####################
 
         self.layout = QtWidgets.QVBoxLayout(self)
@@ -107,7 +108,6 @@ class eyeTrackingWidget(QtWidgets.QWidget):
         #self.videoItem.setAspectRatioMode(1)
         self.player.setMedia(content)
         f = open('../../test_ges.txt').readlines()
-        self.ges_dict = {}
         for i in f:
             t=i.strip().split()
             self.ges_dict[int(t[1])]=self.gesture_dict[int(t[0])]
@@ -115,7 +115,6 @@ class eyeTrackingWidget(QtWidgets.QWidget):
 
     def play_pause(self):
         #self.videoItem.setSize(QtCore.QSizeF(self.view_width, self.view_height))
-
         if self.player.state() == QM.QMediaPlayer.PlayingState:
             self.play_state = False
             self.player.pause()
@@ -143,7 +142,7 @@ class eyeTrackingWidget(QtWidgets.QWidget):
             if self.time in self.ges_dict.keys():
                 self.three = self.two
                 self.two = self.one
-                self.one = self.ges_dict[self.time]+' '+'<font size=3>'+str(self.time)+'</font><br><br>'
+                self.one = self.ges_dict[self.time]+' '+'<br>'+str(self.time)+'<br><br>'
                 self.label.setText("<h1><b><font size=8>"+self.one+"</font><font size=5>"+self.two+"</font><font size=3>"+self.three+"</font></b>")
                 # label = QtWidgets.QLabel("<h1><b><font size=5>"+"Testing!"+"</font></b>")
                 # self.scene.addWidget(label)#,1,0,QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)

@@ -5,7 +5,8 @@ import numpy as np
 import math
 import video_eye_tracking
 import gesture_widget
-import audio_widget
+#import audio_widget
+from vlc_widget import VLCPlayerWidget
 # pyqtgraph.examples.run()
 # comment
 
@@ -46,16 +47,20 @@ class Ui_MainWindow(object):
         # self.slider = QtGui.QSlider(QtCore.Qt.Horizontal, self.centralWidget)
         # self.slider.setGeometry(QtCore.QRect(20,500,500,60))
 
-        self.audioWidget = audio_widget.audioWidget(self.centralWidget)
+        self.audioWidget = QtWidgets.QWidget(self.centralWidget)
         self.audioWidget.setGeometry(QtCore.QRect(5, 600, 954, 300))
-        self.audioWidget.setObjectName(_fromUtf8("graphicsView"))
+        self.audioWidget.setObjectName(_fromUtf8("audioView"))
+        self.l = QtWidgets.QVBoxLayout()
+        self.audioWidget.setLayout(self.l)
+        self.vlcplayer = VLCPlayerWidget()
+        self.l.addWidget(self.vlcplayer)
 
         self.video_widget.positionSlider.rangeChanged.connect(self.syncEggRange)
         self.video_widget.positionSlider.valueChanged.connect(self.SyncScroll)
         self.gestureWidget.positionSlider.valueChanged.connect(self.SyncScroll2)
         self.gestureWidget.positionSlider.sliderMoved.connect(self.updateScroll)
-        self.audioWidget.positionSlider.valueChanged.connect(self.SyncScroll3)
-        self.audioWidget.positionSlider.sliderMoved.connect(self.updateScroll)
+        self.vlcplayer.positionSlider.valueChanged.connect(self.SyncScroll3)
+        self.vlcplayer.positionSlider.sliderMoved.connect(self.updateScroll)
         # if self.gestureWidget.pause_signal == True:
         # 	video_eye_tracking.eyeTrackingWidget(self.video_widget)
         MainWindow.setCentralWidget(self.centralWidget)
@@ -65,7 +70,7 @@ class Ui_MainWindow(object):
 
     def syncEggRange(self):
     	self.gestureWidget.positionSlider.setRange(0, self.video_widget.positionSlider.maximum())
-    	self.audioWidget.positionSlider.setRange(0, self.video_widget.positionSlider.maximum())
+    	self.vlcplayer.positionSlider.setRange(0, self.video_widget.positionSlider.maximum())
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
@@ -75,25 +80,25 @@ class Ui_MainWindow(object):
     	self.gestureWidget.positionSlider.setValue(position)
     	if self.gestureWidget.pause_signal == True:
     		self.video_widget.play_pause()
-    		self.audioWidget.play_pause()
+    		self.vlcplayer.PlayPause()
 
     def SyncScroll2(self,position):
-    	self.audioWidget.positionSlider.setValue(position)
-    	self.audioWidget.player.setPosition(position)
+    	self.vlcplayer.positionSlider.setValue(position)
+    	self.vlcplayer.setPosition(position)
     	self.video_widget.positionSlider.setValue(position)
     	self.video_widget.player.setPosition(position)
 
     def updateScroll(self,position):
         self.video_widget.play_pause()
-        self.audioWidget.play_pause()
+        self.vlcplayer.PlayPause()
         self.video_widget.positionSlider.setValue(position)
         self.video_widget.player.setPosition(position)
-        self.audioWidget.positionSlider.setValue(position)
-        self.audioWidget.player.setPosition(position)
+        self.vlcplayer.positionSlider.setValue(position)
+        self.vlcplayer.setPosition(position)
 
     def SyncScroll3(self,position):
-    	if self.video_widget.play_state != self.audioWidget.play_state:
-    		self.audioWidget.play_pause()
+        if self.video_widget.play_state == self.vlcplayer.isPaused:
+            self.vlcplayer.PlayPause()
 
 
 if __name__ == "__main__":
