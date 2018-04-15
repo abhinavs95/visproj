@@ -12,57 +12,22 @@ import math
 import random
 import pandas
 
-class eyeTrackingWidget(QtWidgets.QWidget):
-    def __init__(self, *args, **kwargs):
-        QtWidgets.QWidget.__init__(self, *args, **kwargs)
-        self.view_width= 910 ##QGraphicsView resolution
-        self.view_height= 300 ##QGraphcsView
-        self.play_state = False
-        self.gesture_dict = {0:'metaphoric',1:'beats',2:'deictics',3:'iconic'}
-        self.ges_dict=None
+class videoWidget(QtWidgets.QtWidget):
+	def __init__(self, *args, **kwargs):
+		QtWidgets.QtWidget.__init__(self,*args,**kwargs)
+		self.view_width= 910 
+        self.view_height= 300
+		# for rolling gesture view
+		self.gesture_dict = {0:'metaphoric',1:'beats',2:'deictics',3:'iconic'}
+        self.ges_dict = {}
         self.one = ''
         self.two = ''
-        self.time = -1
-        self.ges_dict = {}
-        #####################       eye tracking        #####################
-
-        #self.layout = QtWidgets.QVBoxLayout(self)
-        #self.player = QM.QMediaPlayer()
-
-        # self.qv = QVideoWidget()
-        # self.scene = QGraphicsScene()
-        # self.scene.setSceneRect(0, 0, self.view_width, self.view_height);
-        # self.player.setVideoOutput(self.qv)
-        # self.proxy = self.scene.addWidget(self.qv)
-        # self.view = QGraphicsView(self.scene, self)
-
-        # self.videoItem = QGraphicsVideoItem()
-        # #self.videoItem.setAspectRatioMode(QtCore.Qt.KeepAspectRatio)
-        # self.scene = QtWidgets.QGraphicsScene(self)
-        # self.view = QtWidgets.QGraphicsView(self.scene)
-        # self.player.setVideoOutput(self.videoItem)
-        # self.scene.addItem(self.videoItem)
-
-        # self.label = QtWidgets.QLabel()
-        # self.label.setFixedWidth(200)
-        # self.label.setFixedHeight(self.view_height)
-        # self.scene.addWidget(self.label)
-
-        # self.view.setGeometry(0, 0, self.view_width, self.view_height)
-        # self.scene.setSceneRect(0, 0, self.view_width, self.view_height)
-        # self.videoItem.setSize(QtCore.QSizeF(self.view_width, self.view_height))
-        # #self.videoItem.setAspectRatioMode(QtCore.Qt.KeepAspectRatio)
-        # self.videoItem.setPos(0, 0)
-        # self.layout.addWidget(self.view)
-
-        # self.createUI()
-        # self.view.show()
 
         self.view = QtWidgets.QGraphicsView()
         self.view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.view.setViewport(QtOpenGL.QGLWidget())
-        self.view.setFixedSize(self.view_width +2,self.view_height + 2)
+        self.view.setFixedSize(self.view_width,self.view_height)
         self.view.setGeometry(0,0,self.view_width,self.view_height)
         self.videoItem = QGraphicsVideoItem()
 
@@ -76,25 +41,20 @@ class eyeTrackingWidget(QtWidgets.QWidget):
         self.scene = QtWidgets.QGraphicsScene()
         self.scene.addItem(self.videoItem)
 
-        self.label = QtWidgets.QLabel()
-        self.label.setFixedWidth(200)
-        self.label.setFixedHeight(self.view_height)
-        self.scene.addWidget(self.label)
-
         self.view.setScene(self.scene)
         self.scene.setSceneRect(0, 0, self.view_width, self.view_height)
         self.videoItem.setPos(0,0)
-        ###############################
+        
+        self.label = QtWidgets.QLabel()
+        self.label.setFixedWidth(200)
+        self.label.setFixedHeight(self.view_height)
+        
 
-
-        self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.addWidget(self.view)
+        self.layout = QtWidgets.QGridLayout(self)
+        self.layout.addWidget(self.label,0,0)
+        self.layout.addWidget(self.view,0,1)
         self.createUI()
         self.view.show()
-
-
-        # player.setInterval(self.eye_track_frame_rate)
-        # timer.timeout.connect(self.draw_eye_tracking)
 
     def createUI(self):
 
@@ -116,8 +76,8 @@ class eyeTrackingWidget(QtWidgets.QWidget):
         self.openbutton.clicked.connect(self.open_file)
 
         self.hbuttonbox.addStretch(1)
-        self.layout.addWidget(self.positionSlider)
-        self.layout.addLayout(self.hbuttonbox)
+        self.layout.addWidget(self.positionSlider,1,0)
+        self.layout.addLayout(self.hbuttonbox,2,0)
 
         self.player.setNotifyInterval(1000)
         self.player.positionChanged.connect(self.updateUI)
@@ -125,6 +85,7 @@ class eyeTrackingWidget(QtWidgets.QWidget):
         self.player.durationChanged.connect(self.setRange)
         self.player.stateChanged.connect(self.setButtonCaption)
         self.setLayout(self.layout)
+
 
     def setButtonCaption(self,state):
         if self.player.state() == QM.QMediaPlayer.PlayingState:
@@ -187,3 +148,4 @@ if __name__ == '__main__':
     w = eyeTrackingWidget()
     w.show()
     sys.exit(app.exec_())
+
