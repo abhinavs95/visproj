@@ -37,11 +37,11 @@ class Ui_MainWindow(object):
         self.centralWidget = QtWidgets.QWidget(MainWindow)
         self.centralWidget.setObjectName(_fromUtf8("centralWidget"))
         self.video_widget = video_widget.videoWidget(self.centralWidget)#video_eye_tracking.eyeTrackingWidget(self.centralWidget)
-        self.video_widget.setGeometry(QtCore.QRect(5, 5, 954, 600))
+        self.video_widget.setGeometry(QtCore.QRect(5, 5, 954, 700))
         self.video_widget.setObjectName(_fromUtf8("eyeTrackingWidget"))
 
         self.gestureWidget = gesture_widget.gestureWidget(self.centralWidget)
-        self.gestureWidget.setGeometry(QtCore.QRect(5, 600, 954, 200))
+        self.gestureWidget.setGeometry(QtCore.QRect(5, 700, 954, 200))
         self.gestureWidget.setObjectName(_fromUtf8("graphicsView"))
 
         # self.slider = QtGui.QSlider(QtCore.Qt.Horizontal, self.centralWidget)

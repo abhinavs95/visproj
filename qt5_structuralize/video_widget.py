@@ -25,6 +25,13 @@ class videoWidget(QtWidgets.QWidget):
 		self.one = ''
 		self.two = ''
 		self.time = -1
+		self.noseData = None
+
+		self.line = QtWidgets.QGraphicsLineItem()
+		self.pen = QtGui.QPen()
+		self.pen.setWidth(5)
+		self.pen.setBrush(QtGui.QColor(0, 0, 255, 200))
+		self.line.setPen(self.pen)
 
 		# vlc widget
 		self.instance = vlc.Instance()
@@ -49,6 +56,7 @@ class videoWidget(QtWidgets.QWidget):
 
 		self.scene = QtWidgets.QGraphicsScene()
 		self.scene.addItem(self.videoItem)
+		self.scene.addItem(self.line)
 
 		self.view.setScene(self.scene)
 		self.scene.setSceneRect(0, 0, self.view_width, self.view_height)
@@ -59,27 +67,30 @@ class videoWidget(QtWidgets.QWidget):
 		self.label.setFixedHeight(self.view_height)
 
 
-		self.layout = QtWidgets.QGridLayout(self)
-		self.layout.addWidget(self.label,0,0)
-		self.layout.addWidget(self.view,0,1)
+		self.layout1 = QtWidgets.QGridLayout()
+		self.layout1.addWidget(self.label,0,0)
+		self.layout1.addWidget(self.view,0,1)
+		self.layout = QtWidgets.QVBoxLayout(self)
+		self.layout.addLayout(self.layout1)
 		self.createUI()
 		self.view.show()
 
 	def createUI(self):
 		# vlc widget
 		self.vlcWidget = QtWidgets.QWidget(self)
-		self.vlcWidget.setGeometry(QtCore.QRect(0, 0, 954, 240))
+		self.vlcWidget.setGeometry(QtCore.QRect(0, 0, 910, 300))
+
+		self.vboxlayout = QtWidgets.QVBoxLayout()
+		self.vlcWidget.setLayout(self.vboxlayout)
 		self.videoframe = QtWidgets.QMacCocoaViewContainer(0)
 		self.palette = self.videoframe.palette()
 		self.palette.setColor (QtGui.QPalette.Window,
 		                       QtGui.QColor(0,0,0))
 		self.videoframe.setPalette(self.palette)
 		self.videoframe.setAutoFillBackground(True)
-
-		self.vboxlayout = QtWidgets.QVBoxLayout()
+		#self.videoframe.resize(300,300)
 		self.vboxlayout.addWidget(self.videoframe)
-		self.vlcWidget.setLayout(self.vboxlayout)
-		self.layout.addWidget(self.vlcWidget,1,0,1,-1)
+		self.layout.addWidget(self.vlcWidget)
 
 		self.hbuttonbox = QtWidgets.QHBoxLayout()
 
@@ -119,9 +130,13 @@ class videoWidget(QtWidgets.QWidget):
 		self.hbuttonbox.addWidget(self.openbutton1)
 		self.openbutton1.clicked.connect(self.OpenFile)
 
+		self.openbutton2 = QtWidgets.QPushButton("Open nose")
+		self.hbuttonbox.addWidget(self.openbutton2)
+		self.openbutton2.clicked.connect(self.open_nose)
+
 		self.hbuttonbox.addStretch(1)
-		self.layout.addWidget(self.positionSlider,2,0,1,-1)
-		self.layout.addLayout(self.hbuttonbox,3,0,1,-1)
+		self.layout.addWidget(self.positionSlider)#,3,0,1,-1)
+		self.layout.addLayout(self.hbuttonbox)#,4,0,1,-1)
 
 		self.player.setNotifyInterval(200)
 		self.player.positionChanged.connect(self.updateUI)
@@ -129,6 +144,18 @@ class videoWidget(QtWidgets.QWidget):
 		self.player.durationChanged.connect(self.setRange)
 		self.player.stateChanged.connect(self.setButtonCaption)
 		self.setLayout(self.layout)
+
+
+	def open_nose(self):
+		home = str(Path.home())
+		filename, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open File", home)
+		if not filename:
+			return
+		self.noseData = pandas.read_csv(filename).as_matrix()
+		self.noseData[:,0] += 22
+		self.noseData[:,1] -= 75
+		self.noseData[:,2] += 22
+		self.noseData[:,3] -= 75
 
 
 	def OpenFile(self):
@@ -220,20 +247,21 @@ class videoWidget(QtWidgets.QWidget):
 
 	def display_gesture(self):
 	    #print(self.positionSlider.value())
-	    if self.time != int(self.positionSlider.value()/1000):
-	        self.time = int(self.positionSlider.value()/1000)
-	        if self.time in self.ges_dict.keys():
-	            self.three = self.two
-	            self.two = self.one
-	            self.one = self.ges_dict[self.time]+' '+'<br>'+str(self.time)+'<br><br>'
-	            self.label.setText("<h1><b><font size=8>"+self.one+"</font><font size=5>"+self.two+"</font><font size=3>"+self.three+"</font></b>")
-	            # label = QtWidgets.QLabel("<h1><b><font size=5>"+"Testing!"+"</font></b>")
-	            # self.scene.addWidget(label)#,1,0,QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+
+		indx = int(self.positionSlider.value()*30/1000)
+		self.line.setLine(self.noseData[indx][0],self.noseData[indx][1],self.noseData[indx][2],self.noseData[indx][3])
+		if self.time != int(self.positionSlider.value()/1000):
+			self.time = int(self.positionSlider.value()/1000)
+			if self.time in self.ges_dict.keys():
+				self.three = self.two
+				self.two = self.one
+				self.one = self.ges_dict[self.time]+' '+'<br>'+str(self.time)+'<br><br>'
+				self.label.setText("<h1><b><font size=8>"+self.one+"</font><font size=5>"+self.two+"</font><font size=3>"+self.three+"</font></b>")
 
 if __name__ == '__main__':
 
     app = QtWidgets.QApplication(sys.argv)
-    w = eyeTrackingWidget()
+    w = videoWidget()
     w.show()
     sys.exit(app.exec_())
 
