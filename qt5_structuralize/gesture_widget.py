@@ -21,7 +21,7 @@ class gestureWidget(QtWidgets.QWidget):
         self.gesture_len = 0
         self.gesture_dict = {0:'metaphoric',1:'beats',2:'deictics',3:'iconic'}
         self.graph_width = 910
-        self.graph_height = 100
+        self.graph_height = 200
         self.time = 0
         self.layout = QtWidgets.QVBoxLayout(self)
         self.createUI()
