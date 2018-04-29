@@ -1,1 +1,2 @@
-Repository for NSF funded EEG/Eyetracking/Gesture visualization tool
+Visualization tool for NSF funded project on what behaviors make speakers engaging to an audience.
+Run qt5_structuralize/main_widget.py to bring up the display interface.
